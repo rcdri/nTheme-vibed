@@ -90,6 +90,44 @@ static const struct os_table tables[] = {
 			.checkbox_get = 0x1025e4a8, .checkbox_set = 0x1025e1ec,
 		},
 	},
+	{
+		.osid = 49, .hardware_subtype = 2,
+		.fingerprint_address = 0x10000020, .fingerprint = 0x1042aee0,
+		.model = "CX II CAS", .os_version = "6.4.0.74",
+		.color_table = 0x10b842e8, .color_count = 454,
+		.editor_config = { 0x10bb7550, 0x10bb765c, 0x10bb7768 },
+		.plot_palette = 0x10b7bd58,
+		.menu_literal = 0x10a41a0c, .menu_base = 0x10c44fc4, .menu_context_count = 9,
+		.menu_label_string = 0x3f8, /* "Style" */
+		.event_enter = 0x14c0b, .event_click = 0x14c0d,
+		.set_color_driver = { 0x100291c4, 0xE92D4038, 0xE590C030 }, /* push {r3,r4,r5,lr}; ldr ip,[r0,#0x30] */
+		.set_color_wrapper_return = 0x1004d224,
+		.home_background = { 0x103162f8, 0xE3A0C004, 0xE1A00004 },  /* mov ip,#4; mov r0,r4 */
+		.home_title = { 0x103162c0, 0xE280300B, 0xE1A00004 },       /* add r3,r0,#0xb; mov r0,r4 */
+		.home_title_font = 0x10b,
+		.os_code_begin = 0x10000000, .os_code_end = 0x10C00000,
+		.ids = {
+			.home_background = 99, .home_section_title = 101,
+			.home_list_background = 103, .home_list_text = 105,
+			.home_doc_name_background = 109, .home_doc_name_text = 110,
+			.keep_first = 94, .keep_last = 110,
+			.keep = keep_6_4, .keep_count = sizeof keep_6_4 / sizeof keep_6_4[0],
+			.dim = dim_6_4, .dim_count = sizeof dim_6_4 / sizeof dim_6_4[0],
+			.accent_text = accent_text_6_4,
+			.accent_text_count = sizeof accent_text_6_4 / sizeof accent_text_6_4[0],
+			.stock_accent = 0x2478CF, .plot_grid_index = 9,
+		},
+		.dialog = {
+			.dialog_new = 0x1025eb0c, .dialog_content = 0x1025ea4c,
+			.panel_new = 0x1025ea48, .set_layout = 0x1025ebf0,
+			.add_label = 0x1025eb08, .add_combo = 0x1025eb5c, .add_checkbox = 0x1025eb9c,
+			.pair_components = 0x1025ec30, .add_button = 0x1006ffd0,
+			.set_default_button = 0x1025ec14, .set_escape_button = 0x1025ec04,
+			.run_or_close = 0x1025ebe8, .component_dialog = 0x1025eb24, .dialog_delete = 0x1025ec34,
+			.combo_get = 0x1025ebd8, .combo_set = 0x1025ec24,
+			.checkbox_get = 0x1025ec40, .checkbox_set = 0x1025e984,
+		},
+	},
 };
 
 const struct os_table *os_table_lookup(unsigned osid)
