@@ -11,9 +11,8 @@ Alpha release, see below for specific model support information.
 
 ## Supported Calculators
 Note: OS 6.4.0.74/ndless r2022
-- TI-Nspire CX II
-- TI-Nspire CX II CAS
-- TI-Nspire CX II-T
+- TI-Nspire CX II(-T)
+- TI-Nspire CX II(-T/-C) CAS
 
 ## Features
 
