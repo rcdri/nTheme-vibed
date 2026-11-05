@@ -58,3 +58,27 @@ unsigned dark_remap(unsigned rgb)
 		return rgb;
 	}
 }
+
+bool dark_is_light_gray(unsigned rgb)
+{
+	int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, b = rgb & 255;
+	int max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+	int min = r < g ? (r < b ? r : b) : (g < b ? g : b);
+	return max - min <= DARK_GRAY_CHROMA && (max + min) / 2 >= DARK_LIGHT_GRAY;
+}
+
+unsigned dark_flip_gray(unsigned rgb)
+{
+	int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, b = rgb & 255;
+	int max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+	int min = r < g ? (r < b ? r : b) : (g < b ? g : b);
+	int lightness = (max + min) / 2;
+	int d = 229 - (199 * lightness) / 255 - lightness;
+	r += d, g += d, b += d;
+	return pack(r < 0 ? 0 : r > 255 ? 255 : r, g < 0 ? 0 : g > 255 ? 255 : g, b < 0 ? 0 : b > 255 ? 255 : b);
+}
+
+bool dark_is_near_black(unsigned rgb)
+{
+	return ((rgb >> 16) & 255) <= DARK_NEAR_BLACK && ((rgb >> 8) & 255) <= DARK_NEAR_BLACK && (rgb & 255) <= DARK_NEAR_BLACK;
+}

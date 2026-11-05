@@ -72,6 +72,9 @@ struct os_table {
 	unsigned set_color_wrapper_return;   /* return address inside the gui_gc_setColorRGB wrapper */
 	struct hook_site home_background;    /* home painter, right after its background fill; r4 = gc */
 	struct hook_site home_title;         /* home painter, right before its title drawString; r1 = text, r2 = x, r4 = gc */
+	struct hook_site view_3d;            /* 3D graphing present, right after it copied its rendered image to the
+	                                        screen: r7 = view + 0x70; 0 = not located (3D keeps stock colors) */
+	unsigned gc_surface;                 /* gc field pointing at its drawing surface */
 	unsigned home_title_font;
 	unsigned os_code_begin, os_code_end; /* colors set by callers outside this range are never touched */
 

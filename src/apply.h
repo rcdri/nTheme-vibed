@@ -6,8 +6,8 @@
 #include "config.h"
 #include "hooks.h"
 
-/* Reports any failure to the user itself. `defer_wallpaper` = decode the wallpaper at the first home screen
- * paint rather than now (see wallpaper_apply). */
+/* Reports any failure to the user itself. `defer_wallpaper` = decode the wallpaper and recolor the icons at the
+ * first home screen paint rather than now (see wallpaper_apply, icons_apply). */
 void apply_config(const struct config *config, const struct os_table *os, bool defer_wallpaper);
 
 #endif

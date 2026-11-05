@@ -1,5 +1,6 @@
 #include "apply.h"
 #include "theme.h"
+#include "icons.h"
 #include "glass.h"
 #include "wallpaper.h"
 #include "title.h"
@@ -9,6 +10,7 @@
 void apply_config(const struct config *config, const struct os_table *os, bool defer_wallpaper)
 {
 	theme_apply(config->theme, ACCENT_RGB[config->accent]);
+	icons_apply(config->theme, ACCENT_RGB[config->accent], defer_wallpaper);   /* same startup memory limit */
 	glass_apply(os, config->glass);   /* after the theme: dark mode must not flip the glass sentinel */
 	char error[160];
 	if (!wallpaper_apply(config->wallpaper, config->wallpaper_file, config->wallpaper_scale,

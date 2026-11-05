@@ -4,7 +4,7 @@ GCC = nspire-gcc
 LD = nspire-ld
 GENZEHN = genzehn
 
-CFLAGS = -Wall -W -std=gnu99 -marm -Os -Isrc -Ibuild $(EXTRA_CFLAGS)
+CFLAGS = -Wall -W -std=gnu99 -marm -Os -Isrc -Ibuild -MMD -MP $(EXTRA_CFLAGS)
 # Pull libsyscalls' allocator in before newlib's libc is scanned; recent Arm GNU
 # toolchains otherwise link newlib's _malloc_r first and fail on the duplicate.
 LDFLAGS = -Wl,-u,malloc -Wl,-u,abort -Wl,-u,_malloc_r
@@ -35,6 +35,9 @@ $(EXE).tns: $(EXE).elf
 	$(GENZEHN) --input $< --output $@.zehn --name "$(EXE)" --notice "nTheme $(VERSION)" --240x320-support true
 	make-prg $@.zehn $@
 	rm $@.zehn
+
+# Header dependencies (-MMD): a changed header such as hooks.h rebuilds every object that uses it.
+-include $(OBJECTS:.o=.d)
 
 clean:
 	rm -rf build $(EXE).elf $(EXE).tns

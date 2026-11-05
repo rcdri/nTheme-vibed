@@ -708,9 +708,27 @@ def find_style_string(code, r):
     raise Unresolved("'Style' not among the %d syst strings" % count)
 
 
+# 3D graphing present: bl blit; bl ...; rsb r2,r6,r0; str r2,[r5,#4]; ldr r5,[r4]; cmp r5,#0
+VIEW_3D_TAIL = (0xE0662000, 0xE5852004, 0xE5945000, 0xE3550000)
+
+
+def find_view_3d(code, r):
+    image = code.image
+    pattern = struct.pack("<4I", *VIEW_3D_TAIL)
+    hits = [a for a in image.find_all(pattern)
+            if a % 4 == 0 and a < CODE_END
+            and is_bl(code.word(a - 4)) and is_bl(code.word(a - 8))]
+    if len(hits) != 1:
+        raise Unresolved("%d 3D present tails (rsb r2,r6,r0; str r2,[r5,#4]; "
+                         "ldr r5,[r4]) after two bl" % len(hits))
+    site = hits[0] + 4
+    r.set("view_3d_site", (site, [code.word(site), code.word(site + 4)]),
+          "str r2,[r5,#4] after the 3D image blit; r7 = view + 0x70")
+
+
 FINDERS = [find_identity, find_color_table, find_menu, find_home_painter,
            find_set_color, find_editor_configs, find_plot_palette,
-           find_dialog, find_style_string]
+           find_dialog, find_style_string, find_view_3d]
 
 
 # ------------------------------------------------------------------- output
@@ -763,6 +781,8 @@ def emit_row(r, out):
                % site(v, "home_background_site"))
     out.append("\t\t.home_title = %s," % site(v, "home_title_site"))
     out.append("\t\t.home_title_font = %s," % g("home_title_font", "0x%x"))
+    out.append("\t\t.view_3d = %s, .gc_surface = 0x44,"
+               % site(v, "view_3d_site"))
     out.append("\t\t.os_code_begin = 0x%08x, .os_code_end = 0x%08x,"
                % (RAM_BASE, CODE_END))
     out.append("\t\t.ids = { .home_background = %s, .plot_grid_index = %s,"

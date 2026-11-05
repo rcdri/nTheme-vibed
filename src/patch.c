@@ -5,6 +5,7 @@
 #include "glass.h"
 #include "wallpaper.h"
 #include "title.h"
+#include "icons.h"
 
 #define TRAMPOLINE 0xE51FF004   /* ldr pc,[pc,#-4]: what an installed Ndless hook reads back as */
 #define SCREEN_WIDTH 320
@@ -47,12 +48,27 @@ HOOK_DEFINE(set_color_hook) {
 	HOOK_RESTORE_RETURN(set_color_hook);
 }
 
-/* Home painter, right after it filled the background. */
+/* Home painter, right after it filled the background (before it draws the app icons). */
 HOOK_DEFINE(home_background_hook) {
+	icons_run_deferred();
 	const void *image = wallpaper_image();
 	if (image)
 		gui_gc_drawImage((Gc)HOOK_SAVED_REGS(home_background_hook)[GC_REGISTER], (char *)image, 0, WALLPAPER_TOP);
 	HOOK_RESTORE_RETURN(home_background_hook);
+}
+
+/* 3D graphing, right after the renderer's image was copied to the screen buffer (2D graphs never get here; they
+ * draw through the color hook). r7 = graph view + 0x70; the view has its width at +0xc, height at +0x10 and its
+ * gc at +0x74 (verified OS 6.4, CX II-T). The image is copied whole each time, so this recolors once per frame. */
+#define VIEW_FROM_R7 0x70
+#define VIEW_GC 0x74
+
+HOOK_DEFINE(view_3d_hook) {
+	unsigned *regs = HOOK_SAVED_REGS(view_3d_hook);
+	const unsigned char *view = (const unsigned char *)(regs[7] - VIEW_FROM_R7);
+	if ((unsigned)view >= 0x10000000u && (unsigned)view < 0x14000000u)
+		theme_recolor_view(*(const void *const *)(view + VIEW_GC), *(const int *)(view + 0xc), *(const int *)(view + 0x10));
+	HOOK_RESTORE_RETURN(view_3d_hook);
 }
 
 /* Home painter, right before it draws the title text: r1 = utf16, r2 = x. */
@@ -69,17 +85,22 @@ HOOK_DEFINE(home_title_hook) {
 	HOOK_RESTORE_RETURN(home_title_hook);
 }
 
+#define MAX_SITES 4
+
 static int sites(const struct os_table *t, const struct hook_site *out[])
 {
-	out[0] = &t->set_color_driver;
-	out[1] = &t->home_background;
-	out[2] = &t->home_title;
-	return 3;
+	int n = 0;
+	out[n++] = &t->set_color_driver;
+	out[n++] = &t->home_background;
+	out[n++] = &t->home_title;
+	if (t->view_3d.address)
+		out[n++] = &t->view_3d;
+	return n;
 }
 
 enum patch_state patch_probe(const struct os_table *t)
 {
-	const struct hook_site *site[3];
+	const struct hook_site *site[MAX_SITES];
 	int count = sites(t, site), pristine = 0, resident = 0;
 	for (int i = 0; i < count; i++) {
 		const unsigned *code = (const unsigned *)site[i]->address;
@@ -106,4 +127,7 @@ void patch_install(const struct os_table *t)
 	HOOK_INSTALL(t->set_color_driver.address, set_color_hook);
 	HOOK_INSTALL(t->home_background.address, home_background_hook);
 	HOOK_INSTALL(t->home_title.address, home_title_hook);
+	if (t->view_3d.address) {   /* HOOK_INSTALL is several statements */
+		HOOK_INSTALL(t->view_3d.address, view_3d_hook);
+	}
 }

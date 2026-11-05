@@ -18,7 +18,10 @@ void theme_apply(enum theme_mode mode, unsigned accent_rgb);
 /* Current table value. */
 unsigned theme_color(unsigned id);
 
-/* Hook side: rewrite a hard-coded OS color when dark mode is on. */
+/* Hook side: rewrite a hard-coded OS color (dark mode, graph colors following the accent). */
 unsigned theme_remap(unsigned rgb);
+
+/* Hook side: recolor a view the OS rendered itself (3D graphing) on the surface `gc` draws to, the same way. */
+void theme_recolor_view(const void *gc, int width, int height);
 
 #endif
