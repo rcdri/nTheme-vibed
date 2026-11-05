@@ -66,6 +66,8 @@ static const struct os_table tables[] = {
 		.set_color_wrapper_return = 0x1004d260,
 		.home_background = { 0x10315a28, 0xE3A0C004, 0xE1A00004 },  /* mov ip,#4; mov r0,r4 */
 		.home_title = { 0x103159f0, 0xE280300B, 0xE1A00004 },       /* add r3,r0,#0xb; mov r0,r4 */
+		.view_3d = { 0x106956f0, 0xE5852004, 0xE5945000 },          /* str r2,[r5,#4]; ldr r5,[r4] */
+		.gc_surface = 0x44,
 		.home_title_font = 0x10b,
 		.os_code_begin = 0x10000000, .os_code_end = 0x10C00000,
 		.ids = {

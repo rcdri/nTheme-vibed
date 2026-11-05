@@ -10,6 +10,7 @@
 #include "settings.h"
 #include "config.h"
 #include "wallpaper.h"
+#include "icons.h"
 #include "apply.h"
 #include "report.h"
 
@@ -21,6 +22,9 @@ static void open_settings(void)
 	const char *deferred = wallpaper_take_deferred_error();
 	if (deferred)
 		report_error("The wallpaper was not loaded when nTheme started. %s", deferred);
+	const char *icons = icons_take_error();
+	if (icons)
+		report_error("%s", icons);
 	struct config edited = current;
 	switch (settings_run(&edited)) {
 	case SETTINGS_FAILED:
